@@ -17,4 +17,8 @@
     height: 32px;
     width: 32px;
   }
+
+  &:hover {
+    border: 1px solid #8a8a8a;
+  }
 }
