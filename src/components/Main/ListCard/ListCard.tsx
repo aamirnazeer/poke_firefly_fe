@@ -1,5 +1,5 @@
-import { Pokemon } from "..";
-import styles from "./index.module.css";
+import { Pokemon } from "../Main";
+import styles from "./ListCard.module.css";
 
 type ListCardPropTypes = {
   el: Pokemon;

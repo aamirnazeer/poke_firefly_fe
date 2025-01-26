@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import styles from "./index.module.css";
+import styles from "./ToggleFavourite.module.css";
 import { LocalContext } from "../../../context/localContext";
 
 export const ToggleFavourite = () => {

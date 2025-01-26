@@ -1,9 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { PokemonModal } from "../PokemonModal";
+import { PokemonModal } from "../PokemonModal/PokemonModal";
 import useAxios from "../../hooks/useAxios";
 import { LocalContext } from "../../context/localContext";
-import { ListCard } from "./ListCard";
+import { ListCard } from "./ListCard/ListCard";
+import styles from "./Main.module.css";
 
 export type Pokemon = {
   name: string;
@@ -34,7 +35,6 @@ export const Main = () => {
 
   useEffect(() => {
     setList([]);
-    console.log("i am reseting the list");
     setOffset(0);
     setHasMore(false);
     setErrorMessage("");
@@ -97,7 +97,6 @@ export const Main = () => {
   const getFavourites = async () => {
     try {
       setIsLoading(true);
-      console.log("      setIsLoading(true);");
       const { data } = await get(`/favourite?limit=15&offset=${offset}`);
       const nextList = data.results.map((el: { name: string; isFavourite: boolean }) => ({
         name: el.name,
@@ -111,12 +110,12 @@ export const Main = () => {
         return [...prev, ...uniqueItems];
       });
       setIsLoading(false);
-      console.log("      setIsLoading(false);");
     } catch (error) {
       setIsLoading(false);
       console.log(error);
     }
   };
+
   const searchPokemon = async (name: string) => {
     try {
       setIsLoading(true);
@@ -165,13 +164,18 @@ export const Main = () => {
 
   if (isLoading && debouncedTerm) return <h4>Searching...</h4>;
 
-  if (isLoading && !list.length) return <h4 style={{ textAlign: "center" }}>Loading...</h4>;
+  if (isLoading && !list.length) return <h4 className={styles.loading}>Loading...</h4>;
 
   if (!isLoading && errorMessage) return <h4>{errorMessage ? errorMessage : "something went wrong"}</h4>;
-  console.log(list, hasMore);
+
   return (
     <main>
-      <InfiniteScroll dataLength={list.length} next={() => setOffset((prev) => prev + 15)} hasMore={hasMore} loader={<h4>Loading...</h4>}>
+      <InfiniteScroll
+        dataLength={list.length}
+        next={() => setOffset((prev) => prev + 15)}
+        hasMore={hasMore}
+        loader={<h4 className={styles.loading}>Loading...</h4>}
+      >
         {list.map((el, index) => {
           return (
             <ListCard

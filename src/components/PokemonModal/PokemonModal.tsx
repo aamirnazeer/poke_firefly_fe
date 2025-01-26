@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styles from "./index.module.css";
+import styles from "./PokemonModal.module.css";
 import axios from "axios";
 import { useIdentifier } from "../../hooks/useIdentifier";
 

@@ -13,9 +13,5 @@ export const SearchBox = () => {
     }
   };
 
-  return (
-    <>
-      <input placeholder="search for pokemon" value={search} onChange={(e) => handleSearch(e.target.value)} disabled={showFavourite} />
-    </>
-  );
+  return <input placeholder="search for pokemon" value={search} onChange={(e) => handleSearch(e.target.value)} disabled={showFavourite} />;
 };
