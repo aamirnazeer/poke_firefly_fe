@@ -3,8 +3,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { PokemonModal } from "../PokemonModal";
 import useAxios from "../../hooks/useAxios";
 import { LocalContext } from "../../context/localContext";
+import { ListCard } from "./ListCard";
 
-type Pokemon = {
+export type Pokemon = {
   name: string;
   isFavourite: boolean;
 };
@@ -69,38 +70,33 @@ export const Main = () => {
     }
   };
 
-  const setFavouritePokeon = async (name: string, favourite: boolean) => {
+  const setFavouritePokemon = async (name: string, favourite: boolean) => {
+    const updateLoadingMatrix = (status: boolean) => {
+      setLoadingMatrix((prev) => ({
+        ...prev,
+        [name]: status,
+      }));
+    };
+
+    const updateList = (isFavourite: boolean) => {
+      const updatedList = list.map((el) => (el.name === name ? { ...el, isFavourite } : el));
+      setList(updatedList);
+    };
+
     try {
-      setLoadingMatrix((prev) => {
-        return {
-          ...prev,
-          [name]: true,
-        };
-      });
+      updateLoadingMatrix(true);
+
       if (!favourite) {
         await post(`/favourite`, { name });
-        const updatedList = list.map((el) => (el.name === name ? { ...el, isFavourite: true } : el));
-        setList(updatedList);
+        updateList(true);
       } else {
         await remove(`/favourite?name=${name}`);
-        const updatedList = list.map((el) => (el.name === name ? { ...el, isFavourite: false } : el));
-        setList(updatedList);
+        updateList(false);
       }
-
-      setLoadingMatrix((prev) => {
-        return {
-          ...prev,
-          [name]: false,
-        };
-      });
     } catch (err) {
-      setLoadingMatrix((prev) => {
-        return {
-          ...prev,
-          [name]: false,
-        };
-      });
       console.log(err);
+    } finally {
+      updateLoadingMatrix(false);
     }
   };
 
@@ -141,39 +137,14 @@ export const Main = () => {
       >
         {list.map((el, index) => {
           return (
-            <div
+            <ListCard
               key={index}
-              style={{
-                padding: "10px",
-                margin: "10px 0",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                height: "48px",
-              }}
-            >
-              <a onClick={() => setOpenPokemon(el.name)} style={{ cursor: "pointer" }}>
-                <span>
-                  {index + 1}: {el.name}
-                </span>
-              </a>
-
-              <button
-                onClick={() => setFavouritePokeon(el.name, el.isFavourite)}
-                style={{
-                  backgroundColor: el.isFavourite ? "#ffd700" : "#f0f0f0",
-                  border: "none",
-                  height: "32px",
-                  width: "32px",
-                  cursor: loadingMatrix[el.name] ? "wait" : "pointer",
-                }}
-                disabled={loadingMatrix[el.name]}
-              >
-                <span style={{ fontSize: "16px" }}>{el.isFavourite ? "★" : "☆"}</span>
-              </button>
-            </div>
+              el={el}
+              index={index}
+              setFavouritePokemon={setFavouritePokemon}
+              setOpenPokemon={setOpenPokemon}
+              loadingMatrix={loadingMatrix}
+            />
           );
         })}
       </InfiniteScroll>
