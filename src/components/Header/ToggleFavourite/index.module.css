@@ -1,0 +1,10 @@
+.favourite {
+  display: flex;
+  align-items: center;
+  height: 36px;
+
+  input {
+    height: 16px;
+    width: 16px;
+  }
+}

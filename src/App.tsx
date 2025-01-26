@@ -9,7 +9,7 @@ function App() {
   const updateSearch = (value: string) => setSearch(value);
   const updateShowFavourite = (value: boolean) => setShowFavourite(value);
   return (
-    <div style={{ width: "720px", margin: "auto" }}>
+    <div>
       <LocalContext.Provider value={{ search, showFavourite, updateSearch, updateShowFavourite }}>
         <Header />
         <Main />

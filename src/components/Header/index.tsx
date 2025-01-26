@@ -1,9 +1,10 @@
 import { SearchBox } from "./SearchBox";
 import { ToggleFavourite } from "./ToggleFavourite";
+import styles from "./index.module.css";
 
 export const Header = () => {
   return (
-    <header style={{ display: "flex", justifyContent: "space-between" }}>
+    <header className={styles.header}>
       <SearchBox />
       <ToggleFavourite />
     </header>
