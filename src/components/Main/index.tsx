@@ -15,6 +15,8 @@ type Matrix = {
 };
 
 export const Main = () => {
+  const localContext = useContext(LocalContext);
+
   const [list, setList] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -23,12 +25,21 @@ export const Main = () => {
   const [loadingMatrix, setLoadingMatrix] = useState<Matrix>({});
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [displayOnlyFavs, setDisplayOnlyFavs] = useState(false);
 
   const { get, post, remove } = useAxios();
-  const localContext = useContext(LocalContext);
 
   const searchValue = localContext?.search;
   const showFavourites = localContext?.showFavourite;
+
+  useEffect(() => {
+    setList([]);
+    console.log("i am reseting the list");
+    setOffset(0);
+    setHasMore(false);
+    setErrorMessage("");
+    setDisplayOnlyFavs(!!showFavourites);
+  }, [showFavourites]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -41,19 +52,71 @@ export const Main = () => {
   }, [searchValue]);
 
   useEffect(() => {
-    if (debouncedTerm) {
+    if (!!debouncedTerm) {
+      setList([]);
       searchPokemon(debouncedTerm);
     } else {
       setErrorMessage("");
-      setList([]);
-      fetchPokemons();
+      setIsLoading(false);
+      if (!displayOnlyFavs) {
+        fetchPokemons();
+      }
     }
   }, [debouncedTerm]);
 
   useEffect(() => {
-    fetchPokemons();
-  }, [offset]);
+    if (displayOnlyFavs) {
+      getFavourites();
+    } else {
+      fetchPokemons();
+    }
+  }, [offset, displayOnlyFavs]);
 
+  const fetchPokemons = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await get(`/pokemon/?limit=15&offset=${offset}`);
+      const nextList = data.results.map((el: { name: string; isFavourite: boolean }) => ({
+        name: el.name,
+        isFavourite: el.isFavourite,
+      }));
+      const { next } = data;
+      setHasMore(next);
+      setList((prev) => {
+        const existingNames = new Set(prev.map((item) => item.name));
+        const uniqueItems = nextList.filter((item: Pokemon) => !existingNames.has(item.name));
+        return [...prev, ...uniqueItems];
+      });
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
+  const getFavourites = async () => {
+    try {
+      setIsLoading(true);
+      console.log("      setIsLoading(true);");
+      const { data } = await get(`/favourite?limit=15&offset=${offset}`);
+      const nextList = data.results.map((el: { name: string; isFavourite: boolean }) => ({
+        name: el.name,
+        isFavourite: el.isFavourite,
+      }));
+      const { next } = data;
+      setHasMore(next);
+      setList((prev) => {
+        const existingNames = new Set(prev.map((item) => item.name));
+        const uniqueItems = nextList.filter((item: Pokemon) => !existingNames.has(item.name));
+        return [...prev, ...uniqueItems];
+      });
+      setIsLoading(false);
+      console.log("      setIsLoading(false);");
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
   const searchPokemon = async (name: string) => {
     try {
       setIsLoading(true);
@@ -100,41 +163,15 @@ export const Main = () => {
     }
   };
 
-  const fetchPokemons = async () => {
-    try {
-      setIsLoading(true);
-      const { data } = await get(`/pokemon/?limit=15&offset=${offset}`);
-      const nextList = data.results.map((el: { name: string; isFavourite: boolean }) => ({
-        name: el.name,
-        isFavourite: el.isFavourite,
-      }));
-      const { next } = data;
-      setHasMore(next);
-      setList((prev) => {
-        const existingNames = new Set(prev.map((item) => item.name));
-        const uniqueItems = nextList.filter((item: Pokemon) => !existingNames.has(item.name));
-        return [...prev, ...uniqueItems];
-      });
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
   if (isLoading && debouncedTerm) return <h4>Searching...</h4>;
 
-  if (!isLoading && errorMessage) return <h4>{errorMessage ? errorMessage : "something went wrong"}</h4>;
+  if (isLoading && !list.length) return <h4 style={{ textAlign: "center" }}>Loading...</h4>;
 
+  if (!isLoading && errorMessage) return <h4>{errorMessage ? errorMessage : "something went wrong"}</h4>;
+  console.log(list, hasMore);
   return (
     <main>
-      <InfiniteScroll
-        dataLength={list.length}
-        next={() => setOffset((prev) => prev + 15)}
-        hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
-        endMessage={<p>No more items to load</p>}
-      >
+      <InfiniteScroll dataLength={list.length} next={() => setOffset((prev) => prev + 15)} hasMore={hasMore} loader={<h4>Loading...</h4>}>
         {list.map((el, index) => {
           return (
             <ListCard
