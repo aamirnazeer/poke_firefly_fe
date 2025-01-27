@@ -59,6 +59,7 @@ export const Main = () => {
       setErrorMessage("");
       setIsLoading(false);
       if (!displayOnlyFavs) {
+        setList([]);
         fetchPokemons();
       }
     }
@@ -67,7 +68,7 @@ export const Main = () => {
   useEffect(() => {
     if (displayOnlyFavs) {
       getFavourites();
-    } else {
+    } else if (!debouncedTerm) {
       fetchPokemons();
     }
   }, [offset, displayOnlyFavs]);
