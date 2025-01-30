@@ -8,7 +8,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: opacity 0.3s ease-in-out;
 }
 
 .modalContainer {
@@ -17,7 +16,7 @@
   border-radius: 10px;
   width: 90%;
   width: 400px;
-  min-height: 256px;
+  min-height: 456px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: relative;
   text-align: center;

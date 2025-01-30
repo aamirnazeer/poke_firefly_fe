@@ -1,3 +1,5 @@
+import { SPRITE_ENDPOINT } from "../../../core/env";
+import { capitalizeFirstChar } from "../../../utils/capitalizeFirstChar";
 import { Pokemon } from "../Main";
 import styles from "./ListCard.module.css";
 
@@ -10,14 +12,13 @@ type ListCardPropTypes = {
 };
 
 export const ListCard: React.FC<ListCardPropTypes> = ({ index, el, setFavouritePokemon, setOpenPokemon, loadingMatrix }) => {
-  console.log(el);
   return (
     <div key={index} className={styles.listCard}>
       <a onClick={() => setOpenPokemon(el.name)} style={{ display: "flex", alignItems: "center" }}>
         <span>
-          {index + 1}: {el.name}
+          {index + 1}: {capitalizeFirstChar(el.name)}
         </span>
-        <img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${el.id}.png`} height={70} />
+        <img src={SPRITE_ENDPOINT.replace("_id_", el.id.toString())} height={70} />
       </a>
 
       <button

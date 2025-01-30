@@ -172,7 +172,7 @@ export const Main = () => {
 
   if (!isLoading && errorMessage) return <h4>{errorMessage ? errorMessage : "something went wrong"}</h4>;
 
-  if (!isLoading && !list.length) return <h4>No favourite pokemon</h4>;
+  if (!isLoading && !list.length && showFavourites) return <h4>No favourite pokemon</h4>;
 
   return (
     <main>
