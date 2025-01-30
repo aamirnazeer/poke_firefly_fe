@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import styles from "./PokemonModal.module.css";
-import axios from "axios";
-import { useIdentifier } from "../../hooks/useIdentifier";
+import useAxios from "../../hooks/useAxios";
 
 export const PokemonModal = ({ pokemon, onClose }: { pokemon: string; onClose: () => void }) => {
-  const [pokemonData, setPokemonData] = useState<{ abilities: string[]; types: string[]; evolutions: string[] }>({ abilities: [], types: [], evolutions: [] });
+  const [pokemonData, setPokemonData] = useState<{
+    abilities: string[];
+    types: string[];
+    evolutions: string[];
+    id: number;
+  }>({ abilities: [], types: [], evolutions: [], id: 0 });
   const [loading, setLoading] = useState(false);
 
-  const userId = useIdentifier();
+  const { get } = useAxios();
 
   useEffect(() => {
     getPokemonDetails(pokemon);
@@ -15,9 +19,9 @@ export const PokemonModal = ({ pokemon, onClose }: { pokemon: string; onClose: (
 
   const getPokemonDetails = async (name: string) => {
     setLoading(true);
-    const { data } = await axios.get(`http://localhost:5000/pokemon/${name}`, { headers: { "user-id": userId } });
+    const { data } = await get(`/pokemon/${name}`);
     setLoading(false);
-    setPokemonData(data.data);
+    setPokemonData(data);
   };
 
   if (!pokemon) return null;
@@ -32,6 +36,11 @@ export const PokemonModal = ({ pokemon, onClose }: { pokemon: string; onClose: (
           <p>loading</p>
         ) : (
           <>
+            <img
+              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonData.id}.png`}
+              width={200}
+              height={200}
+            />
             <h1>{pokemon}</h1>
             <div>
               <p>
@@ -43,11 +52,13 @@ export const PokemonModal = ({ pokemon, onClose }: { pokemon: string; onClose: (
                 <strong>Types:</strong> {pokemonData.types.join(", ")}
               </p>
             </div>
-            <div>
-              <p>
-                <strong>Evolutions:</strong> {pokemonData.evolutions.join(", ")}
-              </p>
-            </div>
+            {pokemonData.abilities.length && (
+              <div>
+                <p>
+                  <strong>Evolutions:</strong> {pokemonData.evolutions.join(", ")}
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -16,7 +16,7 @@ export const ToggleFavourite = () => {
 
   return (
     <div className={styles.favourite}>
-      <label htmlFor="favourite">show favourites only</label>
+      <label htmlFor="favourite">Show favourites only</label>
       <input type="checkbox" id="favourite" onChange={(event) => handleFavourite(event.target.checked)} />
     </div>
   );

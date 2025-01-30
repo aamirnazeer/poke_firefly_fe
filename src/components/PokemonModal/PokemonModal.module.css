@@ -17,7 +17,7 @@
   border-radius: 10px;
   width: 90%;
   width: 400px;
-  height: 256px;
+  min-height: 256px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: relative;
   text-align: center;

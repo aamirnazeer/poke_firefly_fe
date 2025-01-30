@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { LocalContext } from "../../../context/localContext";
+import styles from "./SearchBox.module.css";
 
 export const SearchBox = () => {
   const localContext = useContext(LocalContext);
@@ -13,5 +14,5 @@ export const SearchBox = () => {
     }
   };
 
-  return <input placeholder="search for pokemon" value={search} onChange={(e) => handleSearch(e.target.value)} disabled={showFavourite} />;
+  return <input className={styles.searchBox} placeholder="Search" value={search} onChange={(e) => handleSearch(e.target.value)} disabled={showFavourite} />;
 };

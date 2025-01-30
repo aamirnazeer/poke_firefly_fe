@@ -9,6 +9,7 @@ import styles from "./Main.module.css";
 export type Pokemon = {
   name: string;
   isFavourite: boolean;
+  id: number;
 };
 
 type Matrix = {
@@ -77,9 +78,10 @@ export const Main = () => {
     try {
       setIsLoading(true);
       const { data } = await get(`/pokemon/?limit=15&offset=${offset}`);
-      const nextList = data.results.map((el: { name: string; isFavourite: boolean }) => ({
+      const nextList = data.results.map((el: { name: string; isFavourite: boolean; id: number }) => ({
         name: el.name,
         isFavourite: el.isFavourite,
+        id: el.id,
       }));
       const { next } = data;
       setHasMore(next);
@@ -99,9 +101,10 @@ export const Main = () => {
     try {
       setIsLoading(true);
       const { data } = await get(`/favourite?limit=15&offset=${offset}`);
-      const nextList = data.results.map((el: { name: string; isFavourite: boolean }) => ({
+      const nextList = data.results.map((el: { name: string; isFavourite: boolean; id: number }) => ({
         name: el.name,
         isFavourite: el.isFavourite,
+        id: el.id,
       }));
       const { next } = data;
       setHasMore(next);
@@ -133,7 +136,7 @@ export const Main = () => {
     }
   };
 
-  const setFavouritePokemon = async (name: string, favourite: boolean) => {
+  const setFavouritePokemon = async (name: string, id: number, favourite: boolean) => {
     const updateLoadingMatrix = (status: boolean) => {
       setLoadingMatrix((prev) => ({
         ...prev,
@@ -150,7 +153,7 @@ export const Main = () => {
       updateLoadingMatrix(true);
 
       if (!favourite) {
-        await post(`/favourite`, { name });
+        await post(`/favourite`, { name, id });
         updateList(true);
       } else {
         await remove(`/favourite?name=${name}`);
@@ -168,6 +171,8 @@ export const Main = () => {
   if (isLoading && !list.length) return <h4 className={styles.loading}>Loading...</h4>;
 
   if (!isLoading && errorMessage) return <h4>{errorMessage ? errorMessage : "something went wrong"}</h4>;
+
+  if (!isLoading && !list.length) return <h4>No favourite pokemon</h4>;
 
   return (
     <main>
